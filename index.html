@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sci-Fi Skill Screen</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #18e8ff;
+      --primary-glow: #18e8ff;
+      --secondary-color: #0077b6;
+      --dark-bg: rgba(0, 12, 24, 0.85);
+      --darker-bg: rgba(0, 6, 12, 0.92);
+      --text-color: #ffffff;
+      --border-color: rgba(24, 232, 255, 0.7);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #000;
+      font-family: 'Rajdhani', sans-serif;
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .skill-screen {
+      width: 100%;
+      max-width: 700px; /* Wider for skills */
+      background-color: var(--dark-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0 20px rgba(24, 232, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Holographic Border and Grid Lines - Reused from Status Screen */
+    .holographic-border {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 2px solid var(--primary-color);
+      box-shadow: 0 0 15px var(--primary-glow), inset 0 0 15px var(--primary-glow);
+      pointer-events: none;
+      z-index: 0;
+      background:
+        linear-gradient(to right, transparent 2%, var(--border-color) 2%, var(--border-color) 3%, transparent 3%) top left/100% 100%,
+        linear-gradient(to right, transparent 97%, var(--border-color) 97%, var(--border-color) 98%, transparent 98%) top left/100% 100%,
+        linear-gradient(to bottom, transparent 2%, var(--border-color) 2%, var(--border-color) 3%, transparent 3%) top left/100% 100%,
+        linear-gradient(to bottom, transparent 97%, var(--border-color) 97%, var(--border-color) 98%, transparent 98%) top left/100% 100%;
+      background-repeat: no-repeat;
+    }
+
+    .corner-bracket {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border: 2px solid var(--primary-color);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    .corner-top-left {
+      top: 5px;
+      left: 5px;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .corner-top-right {
+      top: 5px;
+      right: 5px;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .corner-bottom-left {
+      bottom: 5px;
+      left: 5px;
+      border-right: none;
+      border-top: none;
+    }
+
+    .corner-bottom-right {
+      bottom: 5px;
+      right: 5px;
+      border-left: none;
+      border-top: none;
+    }
+
+    .grid-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        linear-gradient(to right, transparent 50%, rgba(24, 232, 255, 0.05) 50%) 0 0/50px 100%,
+        linear-gradient(to bottom, transparent 50%, rgba(24, 232, 255, 0.05) 50%) 0 0/100% 50px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 40px 30px;
+    }
+
+    .header-box {
+      background-color: var(--darker-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0 10px rgba(24, 232, 255, 0.2);
+      text-align: center;
+      padding: 10px;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .digital-effect {
+      position: absolute;
+      top: -5px;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(to right,
+        transparent,
+        var(--primary-color),
+        transparent);
+      opacity: 0.7;
+    }
+
+    .skills-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--primary-color);
+      text-shadow: 0 0 8px var(--primary-glow);
+    }
+
+    .skill-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px; /* Spacing between skills */
+      width: 100%;
+    }
+
+    .skill-item-display { /* For Display version of Skill Item */
+      display: flex;
+      align-items: flex-start; /* Align items to the top */
+      gap: 15px;
+      padding: 15px;
+      background-color: var(--darker-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(24, 232, 255, 0.2);
+    }
+
+    .skill-icon-display { /* For Display version of Skill Icon */
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      background-color: rgba(0, 12, 24, 0.5);
+      box-shadow: 0 0 5px rgba(24, 232, 255, 0.3);
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      text-shadow: 0 0 5px var(--primary-glow);
+    }
+
+
+    .skill-info-display { /* For Display version of Skill Info */
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .skill-name-display { /* For Display version of Skill Name */
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .skill-description-display { /* For Display version of Skill Description */
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+
+
+    /* Button Styles - Reused from Status Screen */
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 700px; /* Wider for skills */
+    }
+
+    .custom-button {
+      flex: 1;
+      background-color: rgba(0, 12, 24, 0.7);
+      color: var(--primary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 10px;
+      cursor: pointer;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 0 5px rgba(24, 232, 255, 0.3);
+    }
+
+    .custom-button:hover {
+      background-color: rgba(24, 232, 255, 0.2);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    .customize-skills-panel { /* New Customize Skills Panel */
+      width: 100%;
+      max-width: 700px;
+      background-color: var(--darker-bg);
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 0 20px rgba(24, 232, 255, 0.3);
+    }
+
+    .customize-title { /* Reused Customize Title Style */
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      text-shadow: 0 0 5px var(--primary-glow);
+      text-align: center;
+    }
+
+    .form-row { /* Reused Form Row Style */
+      display: grid;
+      grid-template-columns: 1fr; /* Single column for skills form */
+      gap: 15px;
+      margin-bottom: 15px;
+      position: relative; /* For delete button positioning */
+    }
+
+    .form-group { /* Reused Form Group Style */
+      margin-bottom: 10px;
+    }
+
+    label { /* Reused Label Style */
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      opacity: 0.9;
+      color: var(--primary-color);
+    }
+
+    .skill-icon-selector { /* Reused Skill Icon Selector Style - for customize panel*/
+      width: 100%; /* Full width in form */
+      margin-bottom: 10px;
+    }
+    .skill-icon-selector select { /* Reused Skill Icon Selector Style - for customize panel*/
+      width: 100%;
+      padding: 8px;
+      background-color: rgba(0, 12, 24, 0.7);
+      color: var(--primary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 1.2rem;
+      text-align: left; /* Align text left in dropdown */
+      appearance: auto; /* Restore default dropdown arrow */
+      -webkit-appearance: auto;
+      -moz-appearance: auto;
+      font-family: 'Rajdhani', sans-serif; /* Revert to Rajdhani for text in dropdown */
+      font-weight: normal; /* Normal font weight for text */
+      text-shadow: none; /* Remove text shadow for text in dropdown */
+    }
+    .skill-icon-selector select option:before { /* Style icons in dropdown options */
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      margin-right: 5px;
+      content: attr(data-icon); /* Use data-icon attribute for icon content */
+    }
+
+
+    .skill-name-input { /* Reused Skill Name Input Style - for customize panel*/
+      width: 100%;
+      padding: 8px;
+      background-color: rgba(0, 12, 24, 0.7);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-color);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px; /* Add margin below input */
+    }
+
+
+    .skill-description-textarea { /* Reused Skill Description Textarea Style - for customize panel*/
+      width: 100%;
+      padding: 8px;
+      background-color: rgba(0, 12, 24, 0.7);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-color);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      resize: vertical; /* Allow vertical resizing */
+      min-height: 100px; /* Increased min-height for customize panel */
+      margin-bottom: 10px; /* Add margin below textarea */
+    }
+
+    .delete-skill-button { /* Delete Skill Button Style */
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(150, 0, 0, 0.7); /* Reddish background */
+      color: var(--primary-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 0 5px rgba(24, 232, 255, 0.3);
+      font-size: 0.8rem;
+    }
+
+    .delete-skill-button:hover {
+      background-color: rgba(200, 0, 0, 0.8); /* Darker red on hover */
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+
+    .hidden { /* Reused Hidden Class */
+      display: none;
+    }
+
+    .notification.show { /* Notification Show Class */
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .notification { /* Notification Style */
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px); /* Start a bit lower */
+      background-color: var(--darker-bg);
+      color: var(--primary-color);
+      padding: 15px 20px;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0 15px rgba(24, 232, 255, 0.5);
+      font-weight: bold;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, transform 0.3s ease-in-out;
+      z-index: 1000;
+    }
+
+    .loading-spinner { /* Loading Spinner Style */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 4px solid rgba(24, 232, 255, 0.3);
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      z-index: 1001;
+      display: none; /* Hidden by default */
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="skill-screen" id="skill-screen">
+    <div class="holographic-border"></div>
+    <div class="corner-bracket corner-top-left"></div>
+    <div class="corner-bracket corner-top-right"></div>
+    <div class="corner-bracket corner-bottom-left"></div>
+    <div class="corner-bracket corner-bottom-right"></div>
+    <div class="grid-lines"></div>
+
+    <div class="content-wrapper">
+      <div class="header-box">
+        <div class="digital-effect"></div>
+        <div class="skills-title">SKILLS</div>
+      </div>
+
+      <div class="skill-list" id="skill-list-display">
+        <!-- Skill items will be dynamically added here by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <div class="button-row" style="margin-top: 20px; width: 100%; max-width: 700px;"> <!-- Moved button-row outside skill-screen -->
+    <button class="custom-button" id="toggle-customize-skills">Customize Skills</button>
+    <button class="custom-button" id="save-local-storage">Save to Local</button>
+    <button class="custom-button" id="reset-skills">Reset Skills</button>
+    <button class="custom-button" id="export-image">Export as Image</button>
+  </div>
+
+  <div class="customize-skills-panel hidden" id="customize-skills-panel">
+    <div class="customize-title">CUSTOMIZE YOUR SKILLS</div>
+    <div id="skill-list-customize">
+      <!-- Skill customization forms will be dynamically added here by JavaScript -->
+    </div>
+
+    <div class="button-row">
+      <button class="custom-button" id="cancel-customize-skills">Cancel</button>
+      <button class="custom-button save-button" id="save-customize-skills">Save Changes</button>
+      <button class="custom-button" id="add-skill">Add Skill</button> <!-- Add Skill Button -->
+    </div>
+  </div>
+
+
+  <div class="notification" id="notification">Notification message</div>
+  <div class="loading-spinner" id="loading-spinner"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const exportButton = document.getElementById('export-image');
+      const notification = document.getElementById('notification');
+      const loadingSpinner = document.getElementById('loading-spinner');
+      const skillListDisplay = document.getElementById('skill-list-display');
+      const skillListCustomize = document.getElementById('skill-list-customize');
+      const customizeSkillsPanel = document.getElementById('customize-skills-panel');
+      const toggleCustomizeSkillsButton = document.getElementById('toggle-customize-skills');
+      const cancelCustomizeSkillsButton = document.getElementById('cancel-customize-skills');
+      const saveCustomizeSkillsButton = document.getElementById('save-customize-skills');
+      const addSkillButton = document.getElementById('add-skill');
+      const saveLocalStorageButton = document.getElementById('save-local-storage');
+      const resetSkillsButton = document.getElementById('reset-skills');
+
+
+      // Default Skill Data with more detailed descriptions
+      const defaultSkillsData = [
+        { icon: 'fa-fire', name: 'Inferno Blast', description: 'Unleashes a devastating blast of fire, incinerating enemies in a wide area. Effective against multiple targets and capable of causing lingering burn damage.' },
+        { icon: 'fa-shield-halved', name: 'Fortified Aegis', description: 'Envelops the user in a powerful energy shield, significantly increasing defense and resistance to all forms of damage for a moderate duration. Provides a crucial tactical advantage in prolonged engagements.' },
+        { icon: 'fa-bolt', name: 'Chain Lightning', description: 'Summons a bolt of pure lightning that jumps between enemies, dealing electrical damage to each target it strikes. Ideal for crowd control and weakening groups of foes.' },
+        { icon: 'fa-magic', name: 'Arcane Empowerment', description: 'Draws upon arcane energies to temporarily enhance magical abilities, increasing spell power and reducing casting time. A key skill for mages seeking to maximize their offensive output.' },
+        { icon: 'fa-sword', name: 'Precision Strike', description: 'Executes a swift and accurate sword strike targeting enemy weak points, dealing high single-target damage and potentially inflicting critical hits. Favored by skilled swordsmen for its lethality.' }
+      ];
+
+      // Load skills from local storage or use default
+      let skillsData = loadSkillsFromLocalStorage() || defaultSkillsData;
+
+
+      // Function to render skill item for display
+      function renderSkillDisplay(skill, index) {
+        const skillItemDisplay = document.createElement('div');
+        skillItemDisplay.classList.add('skill-item-display');
+        skillItemDisplay.dataset.skillIndex = index; // Store index for later updates
+
+        const skillIconDisplay = document.createElement('div');
+        skillIconDisplay.classList.add('skill-icon-display');
+        const iconClass = skill.icon || 'fa-question'; // Default icon if none is set
+        skillIconDisplay.innerHTML = `<i class="fas ${iconClass}"></i>`;
+
+        const skillInfoDisplay = document.createElement('div');
+        skillInfoDisplay.classList.add('skill-info-display');
+
+        const skillNameDisplay = document.createElement('div');
+        skillNameDisplay.classList.add('skill-name-display');
+        skillNameDisplay.textContent = skill.name || 'Skill Name';
+
+        const skillDescriptionDisplay = document.createElement('div');
+        skillDescriptionDisplay.classList.add('skill-description-display');
+        skillDescriptionDisplay.textContent = skill.description || 'Skill Description';
+
+        skillInfoDisplay.appendChild(skillNameDisplay);
+        skillInfoDisplay.appendChild(skillDescriptionDisplay);
+
+        skillItemDisplay.appendChild(skillIconDisplay);
+        skillItemDisplay.appendChild(skillInfoDisplay);
+
+        return skillItemDisplay;
+      }
+
+       // Function to render skill item for customization panel
+      function renderSkillCustomizeForm(skill, index) {
+        const formRow = document.createElement('div');
+        formRow.classList.add('form-row');
+        formRow.dataset.skillIndex = index; // Store index to link form to skill data
+
+        formRow.innerHTML = `
+          <div class="form-group">
+            <label for="skill-icon-${index}">Icon:</label>
+            <div class="skill-icon-selector">
+              <select class="icon-dropdown" id="skill-icon-${index}" data-skill-index="${index}">
+                <option value="fa-question" data-icon="?"> Question Mark</option>
+                <option value="fa-fire" data-icon=""> Fire</option>
+                <option value="fa-water" data-icon=""> Water</option>
+                <option value="fa-wind" data-icon=""> Wind</option>
+                <option value="fa-leaf" data-icon=""> Leaf</option>
+                <option value="fa-bolt" data-icon=""> Lightning</option>
+                <option value="fa-snowflake" data-icon=""> Ice</option>
+                <option value="fa-shield-halved" data-icon=""> Defense</option>
+                <option value="fa-sword" data-icon=""> Attack</option>
+                <option value="fa-magic" data-icon=""> Magic</option>
+                <option value="fa-heart" data-icon=""> Heart</option>
+                <option value="fa-star" data-icon=""> Star</option>
+                <option value="fa-sun" data-icon=""> Sun</option>
+                <option value="fa-moon" data-icon=""> Moon</option>
+                <option value="fa-cloud" data-icon=""> Cloud</option>
+                <option value="fa-tree" data-icon=""> Tree</option>
+                <option value="fa-gem" data-icon=""> Gem</option>
+                <option value="fa-brain" data-icon=""> Brain</option>
+                <option value="fa-eye" data-icon=""> Eye</option>
+                <option value="fa-hand-sparkles" data-icon="ﰍ">ﰍ Sparkles Hand</option>
+                <option value="fa-fist-raised" data-icon=""> Fist Raised</option>
+                <option value="fa-running" data-icon=""> Running</option>
+                <option value="fa-tint" data-icon=""> Drop</option>
+                <option value="fa-flask" data-icon=""> Flask</option>
+                <option value="fa-book" data-icon=""> Book</option>
+                <option value="fa-scroll" data-icon=""> Scroll</option>
+                <option value="fa-feather-alt" data-icon=""> Feather</option>
+                <option value="fa-compass" data-icon=""> Compass</option>
+                <option value="fa-cog" data-icon=""> Cog</option>
+                <option value="fa-wrench" data-icon=""> Wrench</option>
+                <option value="fa-hammer" data-icon=""> Hammer</option>
+                <!-- Add more Font Awesome icons here with data-icon attribute -->
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="skill-name-${index}">Name:</label>
+            <input type="text" class="skill-name-input" id="skill-name-${index}" value="${skill.name || ''}" placeholder="Skill Name">
+          </div>
+          <div class="form-group">
+            <label for="skill-description-${index}">Description:</label>
+            <textarea class="skill-description-textarea" id="skill-description-${index}" placeholder="Skill Description">${skill.description || ''}</textarea>
+          </div>
+          <button class="delete-skill-button" data-skill-index="${index}">Delete Skill</button>
+        `;
+        return formRow;
+      }
+
+
+      // Function to initially populate skill list display and customize forms
+      function populateSkillLists() {
+        skillListDisplay.innerHTML = ''; // Clear existing display
+        skillListCustomize.innerHTML = ''; // Clear existing customize forms
+
+        skillsData.forEach((skill, index) => {
+          skillListDisplay.appendChild(renderSkillDisplay(skill, index));
+          const customizeForm = renderSkillCustomizeForm(skill, index);
+          skillListCustomize.appendChild(customizeForm);
+
+          // Add event listener for delete button AFTER it's added to DOM
+          const deleteButton = customizeForm.querySelector('.delete-skill-button');
+          deleteButton.addEventListener('click', function(event) {
+              event.preventDefault(); // Prevent form submission if inside a form
+              const skillIndexToDelete = parseInt(this.dataset.skillIndex);
+              if (!isNaN(skillIndexToDelete)) {
+                  deleteSkill(skillIndexToDelete);
+              }
+          });
+        });
+        loadCustomizeFormValues(); // Set initial values in customize forms
+      }
+
+
+      // Function to load values from skillsData into customization form inputs
+      function loadCustomizeFormValues() {
+        skillsData.forEach((skill, index) => {
+          document.getElementById(`skill-icon-${index}`).value = skill.icon || 'fa-question';
+          document.getElementById(`skill-name-${index}`).value = skill.name || '';
+          document.getElementById(`skill-description-${index}`).value = skill.description || '';
+        });
+      }
+
+      // Function to save values from customization forms back to skillsData
+      function saveCustomizeFormValues() {
+        skillListCustomize.querySelectorAll('.form-row').forEach(formRow => {
+          const index = parseInt(formRow.dataset.skillIndex);
+          if (!isNaN(index) && skillsData[index]) {
+            skillsData[index] = {
+              icon: document.getElementById(`skill-icon-${index}`).value,
+              name: document.getElementById(`skill-name-${index}`).value,
+              description: document.getElementById(`skill-description-${index}`).value,
+            };
+          }
+        });
+      }
+
+      // Function to delete a skill
+      function deleteSkill(skillIndexToDelete) {
+          skillsData.splice(skillIndexToDelete, 1); // Remove skill from data array
+          populateSkillLists(); // Re-render both lists to reflect deletion
+          showNotification('Skill deleted successfully!');
+      }
+
+      // Function to save skills data to local storage
+      function saveSkillsToLocalStorage() {
+        localStorage.setItem('skillsData', JSON.stringify(skillsData));
+        showNotification('Skills saved to local storage!');
+      }
+
+      // Function to load skills data from local storage
+      function loadSkillsFromLocalStorage() {
+        const storedSkills = localStorage.getItem('skillsData');
+        return storedSkills ? JSON.parse(storedSkills) : null;
+      }
+
+      // Function to reset skills to default
+      function resetSkillsToDefault() {
+        skillsData = [...defaultSkillsData]; // Use spread to create a new array, not just reference
+        populateSkillLists();
+        localStorage.removeItem('skillsData'); // Optionally clear local storage
+        showNotification('Skills reset to default!');
+      }
+
+
+      // Initial population on page load
+      populateSkillLists();
+
+
+      // Toggle customize panel
+      toggleCustomizeSkillsButton.addEventListener('click', function() {
+        customizeSkillsPanel.classList.toggle('hidden');
+      });
+
+      // Cancel customization
+      cancelCustomizeSkillsButton.addEventListener('click', function() {
+        customizeSkillsPanel.classList.add('hidden');
+      });
+
+      // Save customization
+      saveCustomizeSkillsButton.addEventListener('click', function() {
+        saveCustomizeFormValues(); // Save form values to skillsData
+        populateSkillLists();      // Re-render skill display from updated data
+        customizeSkillsPanel.classList.add('hidden');
+        showNotification('Skills updated successfully!');
+      });
+
+      // Add Skill Button functionality
+      addSkillButton.addEventListener('click', function() {
+        skillsData.push({ icon: 'fa-question', name: 'New Skill', description: 'Skill Description' }); // Add new skill object to data
+        populateSkillLists(); // Re-render both lists to include new skill
+      });
+
+      // Save to Local Storage Button functionality
+      saveLocalStorageButton.addEventListener('click', function() {
+        saveSkillsToLocalStorage();
+      });
+
+      // Reset Skills Button functionality
+      resetSkillsButton.addEventListener('click', function() {
+        resetSkillsToDefault();
+      });
+
+
+      // Export as image - Reused from Status Screen, adjusted for skill-screen
+      exportButton.addEventListener('click', function() {
+        loadingSpinner.style.display = 'block';
+        const skillScreen = document.getElementById('skill-screen');
+        const options = {
+          scale: 2,
+          backgroundColor: null,
+          logging: false,
+          useCORS: true
+        };
+
+        html2canvas(skillScreen, options).then(function(canvas) {
+          try {
+            const imgData = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'skill-screen.png';
+            link.href = imgData;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification('Image exported successfully!');
+          } catch (error) {
+            console.error('Export failed:', error);
+            showNotification('Export failed. Try again later.', true);
+          } finally {
+            loadingSpinner.style.display = 'none';
+          }
+        }).catch(function(error) {
+          console.error('html2canvas error:', error);
+          showNotification('Export failed. Try again later.', true);
+          loadingSpinner.style.display = 'none';
+        });
+      });
+
+
+      function showNotification(message, isError = false) {
+        notification.textContent = message;
+        notification.style.backgroundColor = isError ? 'rgba(150, 0, 0, 0.8)' : 'var(--darker-bg)';
+        notification.classList.add('show');
+
+        setTimeout(() => {
+          notification.classList.remove('show');
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
